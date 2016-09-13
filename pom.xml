@@ -8,14 +8,20 @@
     <packaging>jar</packaging>
 
     <name>parameters</name>
-    <url>https://enhorse.xyz</url>
+    <url>https://github.com/pavelkalinin/parameters</url>
 
     <properties>
         <start-class>xyz.enhorse.parameters.Demo</start-class>
 
         <java.version>1.8</java.version>
-        <maven.compiler.version>3.3</maven.compiler.version>
+        <maven.compiler.version>3.5.1</maven.compiler.version>
         <maven.assembly.version>2.6</maven.assembly.version>
+        <maven.deploy.version>2.8.2</maven.deploy.version>
+
+        <maven.github-plugin>0.12</maven.github-plugin>
+        <github.global.server>github.com-pavelkalinin</github.global.server>
+        <maven.repo>parameters</maven.repo>
+        <maven.repo.owner>pavelkalinin</maven.repo.owner>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -46,6 +52,25 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>commons-mvn-repo</id>
+            <url>https://raw.github.com/pavelkalinin/commons/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -57,6 +82,7 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -80,17 +106,41 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.version}</version>
+                <configuration>
+                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo
+                    </altDeploymentRepository>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>${maven.github-plugin}</version>
+                <configuration>
+                    <message>Maven artifacts for ${project.version}</message>
+                    <noJekyll>true</noJekyll>
+                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                    <branch>refs/heads/mvn-repo</branch>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                    <repositoryName>${maven.repo}</repositoryName>
+                    <repositoryOwner>${maven.repo.owner}</repositoryOwner>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-    
-    <repositories>
-        <repository>
-            <id>commons-mvn-repo</id>
-            <url>https://raw.github.com/pavelkalinin/commons/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
+
 </project>
