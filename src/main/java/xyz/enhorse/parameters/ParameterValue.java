@@ -1,7 +1,5 @@
 package xyz.enhorse.parameters;
 
-import xyz.enhorse.commons.PureType;
-import xyz.enhorse.commons.PureTypes;
 import xyz.enhorse.commons.Validate;
 
 /**
